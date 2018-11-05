@@ -1,4 +1,4 @@
-package com.example.yajunbai.mcalcpro;
+package com.example.superman.mcalcpro;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,12 +14,7 @@ import android.widget.Toast;
 import java.util.Locale;
 
 
-public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech.OnInitListener, SensorEventListener {
-
-
-    //private String amortization;
-    // private String interest;
-    //private String principle;
+public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech.OnInitListener, SensorEventListener 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,46 +82,6 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
             return message;
         }
 
-        /*public String getPrinciple(){
-            if(this.principle > 0) {
-
-            String princip = String.format("%d",this.principle);
-            return princip;
-            }
-            else{
-
-                String wrongNo = "This is a wrong number!";
-                return wrongNo;
-            }
-        }
-
-        public String getAmortization(){
-
-            if(this.amortization >= AMORT_MIN && this.amortization <= AMORT_MAX ){
-                String amort = String.format("%d",this.amortization);
-                return amort;
-            }
-
-            else{
-
-                String outrange = "Amortization out of range!";
-                return outrange;
-            }
-        }
-       public String getInterest(){
-
-            if(this.interest  >= 0 && this.interest <= INTEREST_MAX ){
-                String intere = String.format("%f",this.interest);
-                return intere;
-            }
-
-            else{
-
-                String outrange = "Interest out of range!";
-                return outrange;
-            }
-
-        }*/
         public String computePayment(String fmt) {
             final int MONTH_PER_YEAR = 12;
             double r = (this.interest / 100) / MONTH_PER_YEAR;
