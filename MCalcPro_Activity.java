@@ -14,30 +14,26 @@ import android.widget.Toast;
 import java.util.Locale;
 
 
-public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech.OnInitListener, SensorEventListener 
+public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech.OnInitListener, SensorEventListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mcalcpro_layout);
         this.tts = new TextToSpeech(this, this);
-
         mp = new MPro();
-
     }
-
 
     private TextToSpeech tts;
     private MPro mp;
-
 
     public void onInit(int initStatus) {
         this.tts.setLanguage(Locale.US);
     }
 
-
     public void onAccuracyChanged(Sensor arg0, int arg1) {
     }
+
 
     public void onSensorChanged(SensorEvent event) {
         double ax = event.values[0];
@@ -51,6 +47,7 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
             ((TextView) findViewById(R.id.output)).setText("");
         }
     }
+
 
 
     public class MPro {
@@ -68,46 +65,6 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
             this.principle = 0.0;
             this.amortization = AMORT_MIN;
             this.interest = 0.0;
-        }
-
-        public String getMessage() {
-            String message = "";
-            if (this.principle < 0) {
-                message = "Please enter a positive number!";
-            } else if (this.amortization < AMORT_MIN || this.amortization > AMORT_MAX) {
-                message = "Amortization out of range!";
-            } else if (this.interest < 0 || this.interest > INTEREST_MAX) {
-                message = "Interest out of range!";
-            }
-            return message;
-        }
-
-        public String computePayment(String fmt) {
-            final int MONTH_PER_YEAR = 12;
-            double r = (this.interest / 100) / MONTH_PER_YEAR;
-            int n = this.amortization * MONTH_PER_YEAR;
-            double monthlyPayment = (this.principle * r) / (1 - 1 / Math.pow((1 + r), n));
-            fmt = String.format("$%,.2f", monthlyPayment);
-            return fmt;
-
-        }
-
-        public String outstandingAfter(int n, String fmt) {
-
-            final int MONTHS_PER_YEAR = 12;
-            int outstandingAfterMonths;
-            outstandingAfterMonths = n * MONTHS_PER_YEAR;
-
-            double r = (this.interest / 100) / MONTHS_PER_YEAR;
-            int amortizationMonths = this.amortization * MONTHS_PER_YEAR;
-
-            double monthlyPayment = (this.principle * r) / (1 - 1 / Math.pow((1 + r), amortizationMonths));
-            double output = this.principle - (monthlyPayment / r - this.principle) * (Math.pow((1 + r), outstandingAfterMonths) - 1);
-
-//            fmt = String.format("$%,d", (int) (output));
-            return String.format("%,16.0f", output);
-//            return fmt;
-
         }
 
         public void setPrinciple(String p) throws Exception {
@@ -131,10 +88,36 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
             }
         }
 
+        public String computePayment(String fmt) {
+            final int MONTH_PER_YEAR = 12;
+            double r = (this.interest / 100) / MONTH_PER_YEAR;
+            int n = this.amortization * MONTH_PER_YEAR;
+            double monthlyPayment = (this.principle * r) / (1 - 1 / Math.pow((1 + r), n));
+            fmt = String.format("$%,.2f", monthlyPayment);
+            return fmt;
+        }
+
+        public String outstandingAfter(int n, String fmt) {
+
+            final int MONTHS_PER_YEAR = 12;
+            int outstandingAfterMonths;
+            outstandingAfterMonths = n * MONTHS_PER_YEAR;
+
+            double r = (this.interest / 100) / MONTHS_PER_YEAR;
+            int amortizationMonths = this.amortization * MONTHS_PER_YEAR;
+
+            double monthlyPayment = (this.principle * r) / (1 - 1 / Math.pow((1 + r), amortizationMonths));
+            double output = this.principle - (monthlyPayment / r - this.principle) * (Math.pow((1 + r), outstandingAfterMonths) - 1);
+
+            fmt = String.format("%,16.0f", output);
+            //return String.format("%,16.0f", output);
+            return fmt;
+        }
+
     }
 
 
-    public void buttonClicked(View v) throws Exception {
+    public void buttonClicked(View v) {
         try {
             EditText principleView = findViewById(R.id.pBox);
             String principle = principleView.getText().toString();
@@ -152,28 +135,23 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
             mp.setInterest(interest);
 
             String s = "Monthly Payment = " + mp.computePayment("%,.2f");
-            tts.speak(s, TextToSpeech.QUEUE_FLUSH, null);
 
             s += "\n\n";
             s += "By making this payments monthly for " + ((EditText) findViewById(R.id.aBox)).getText().toString()
                     + "years, the mortgage will be paid in full." +
                     "But if you terminate the mortgage on its nth anniversary, the balance still owing depends on n as shown below";
             s += "\n\n";
-
             s += "       " + "n" + "         " + "Balance";
             s += "\n\n";
-
             for (int i = 0; i < 6; i++) {
                 s += String.format("%8d", i) + mp.outstandingAfter(i, "%,16.0f");
                 s += "\n\n";
             }
-
             for (int i = 0; i < 3; i++) {
                 int num = 10 + i * 5;
                 s += String.format("%8d", num) + mp.outstandingAfter(num, "%,16.0f");
                 s += "\n\n";
             }
-
 //            s += String.format("%8d", 0) + mp.outstandingAfter(0, "%,16.0f");
 //            s += "\n\n";
 //            s += String.format("%8d", 1) + mp.outstandingAfter(1, "%,16.0f");
@@ -191,82 +169,15 @@ public class MCalcPro_Activity extends AppCompatActivity implements TextToSpeech
 //            s += String.format("%8d", 15) + mp.outstandingAfter(15, "%,16.0f");
 //            s += "\n\n";
 //            s += String.format("%8d", 20) + mp.outstandingAfter(20, "%,16.0f");
-
+            tts.speak(s, TextToSpeech.QUEUE_FLUSH, null);
             ((TextView) findViewById(R.id.output)).setText(s);
 
-
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
             Toast label = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
             label.show();
         }
-
-
-//        try {
-//            mp.setPrinciple(((EditText) findViewById(R.id.pBox)).getText().toString());
-//
-//        }
-//        catch(Exception e){
-//            Toast label = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
-//            label.show();
-//            //display e.getMessage();
-//        }
-//
-//
-//        try {
-//            mp.setAmortization(((EditText)findViewById(R.id.aBox)).getText().toString());
-//
-//        }
-//        catch(Exception e){
-//            Toast label = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
-//            label.show();
-//            //display e.getMessage();
-//        }
-//
-//        try {
-//            mp.setInterest (((EditText)findViewById(R.id.iBox)).getText().toString());
-//
-//        }
-//        catch(Exception e){
-//            Toast label = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
-//            label.show();
-//           // display e.getMessage();
-//        }
-
-
-//        String s = "Monthly Payment = " + mp.computePayment("%,.2f");
-//        tts.speak(s,TextToSpeech.QUEUE_FLUSH,null);
-//        s += "\n\n";
-//        s += "By making this payments monthly for " +  ((EditText)findViewById(R.id.aBox)).getText().toString()
-//                + "years, the mortgage will be paid in full." +
-//                "But if you terminate the mortgage on its nth anniversary, the balance still owing depends on n as shown below";
-//        s += "\n\n";
-//        s += "        " + "n" + "        " + "Balance";
-//        s += "\n\n";
-//        s += String.format("%8d",0) + mp.outstandingAfter(0,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",1) + mp.outstandingAfter(1,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",2) + mp.outstandingAfter(2,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",3) + mp.outstandingAfter(3,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",4) + mp.outstandingAfter(4,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",5) + mp.outstandingAfter(5,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",10) + mp.outstandingAfter(10,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",15) + mp.outstandingAfter(15,"%,16.0f");
-//        s += "\n\n";
-//        s += String.format("%8d",20) + mp.outstandingAfter(20,"%,16.0f");
-//
-//        ((TextView) findViewById(R.id.output)).setText(s);
-
-
     }
-    //MPro e = new MPro(String p, String a,String i);
-
 
 }
 
