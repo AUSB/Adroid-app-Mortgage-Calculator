@@ -1,5 +1,6 @@
 # CalculMPr 
 This project is to build an Android App which is similar to the mortgage calculator App except for two key differences:
+
 •	A professional look-and-feel on the outside 
 •	Full API delegation on the inside
 
